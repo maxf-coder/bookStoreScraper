@@ -4,7 +4,7 @@ from bookScrape.items import BookItem
 class BookspiderSpider(scrapy.Spider):
     name = "bookSpider"
     allowed_domains = ["librarius.md"]
-    start_urls = ["https://librarius.md/ro/books"]
+    start_urls = ["https://librarius.md/ro/books/page/1"]
 
 
 
@@ -13,6 +13,13 @@ class BookspiderSpider(scrapy.Spider):
         for book in books:
             book_url = book.css('a::attr(href)').get()
             yield response.follow(book_url, callback = self.parse_book)
+
+        next_page = response.css('li.page-item.active + li.page-item')
+        if next_page:
+            next_page_num = next_page.css('::text').get()
+            if int(next_page_num) < 11:
+                next_page_url = next_page.css('a::attr(href)').get()
+                yield response.follow(next_page_url, callback = self.parse)
 
     def parse_book(self, response):
         book = BookItem()
