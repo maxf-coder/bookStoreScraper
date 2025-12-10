@@ -1,6 +1,6 @@
 import scrapy
 from bookScrape.items import BookItem
-
+from configs import scrapingLogger
 class BookspiderSpider(scrapy.Spider):
     name = "bookSpider"
     allowed_domains = ["librarius.md"]
@@ -9,9 +9,9 @@ class BookspiderSpider(scrapy.Spider):
 
 
     def parse(self, response):
-        books = response.css('div.anyproduct-card')
-        for book in books:
-            book_url = book.css('a::attr(href)').get()
+        book_urls = response.css('div.anyproduct-card a::attr(href)').getall()
+        scrapingLogger.info(f"{len(book_urls)} book urls at {response.url}")
+        for book_url in book_urls:
             yield response.follow(book_url, callback = self.parse_book)
 
         next_page = response.css('li.page-item.active + li.page-item')
