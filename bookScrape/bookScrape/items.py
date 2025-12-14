@@ -14,3 +14,9 @@ class BookItem(scrapy.Item):
     old_price = scrapy.Field()
     discount_procent = scrapy.Field()
     properties = scrapy.Field()
+
+class ShopItem(scrapy.Item):
+    id = scrapy.Field()
+    address = scrapy.Field()
+    phone = scrapy.Field()
+    schedule = scrapy.Field()

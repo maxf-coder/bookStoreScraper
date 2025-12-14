@@ -50,11 +50,7 @@ DOWNLOAD_TIMEOUT = 15
 #    "scrapy.extensions.telnet.TelnetConsole": None,
 #}
 
-ITEM_PIPELINES = {
-   "bookScrape.pipelines.BookscrapePipeline": 300,
-   "bookScrape.pipelines.SaveToMySQLPipeline": 400,
-
-}
+ITEM_PIPELINES = {}
 
 # The initial download delay
 #AUTOTHROTTLE_START_DELAY = 5

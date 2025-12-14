@@ -4,6 +4,8 @@ from scrapy.exceptions import DropItem
 import os
 from dotenv import load_dotenv
 from configs import scrapingLogger
+import mysql.connector
+import json
 
 load_dotenv()
 
@@ -65,10 +67,7 @@ class BookscrapePipeline:
         m = re.search(r'\b\d+(\.\d+)?\b', value)
         return float(m.group()) if m else None
 
-
-import mysql.connector
-import json
-class SaveToMySQLPipeline:
+class SaveBookToMySQLPipeline:
     
     def __init__(self):
         self.conn = mysql.connector.connect(

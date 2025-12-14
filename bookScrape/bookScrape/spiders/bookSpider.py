@@ -6,6 +6,12 @@ class BookspiderSpider(scrapy.Spider):
     allowed_domains = ["librarius.md", "www.librarius.md"]
     start_urls = ["https://librarius.md/ro/books/page/1"]
 
+    custom_settings = {
+        "ITEM_PIPELINES": {
+            "bookScrape.pipelines.BookscrapePipeline": 300,
+            "bookScrape.pipelines.SaveBookToMySQLPipeline": 400,
+        }
+    }
 
 
     def parse(self, response):
@@ -47,7 +53,7 @@ class BookspiderSpider(scrapy.Spider):
             value = row.css('div.book-prop-value *::text').get(default = "")
             if key and value:
                 properties[key] = value
-                
+
         book['properties'] = properties
 
         yield book
