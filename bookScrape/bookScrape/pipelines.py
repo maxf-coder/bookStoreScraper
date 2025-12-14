@@ -132,3 +132,29 @@ class SaveBookToMySQLPipeline:
     def close_spider(self, spider):
         self.cur.close()
         self.conn.close()
+
+
+class ShopscrapePipeline:
+    def process_item(self, item, spider):
+        adapter = ItemAdapter(item)
+
+        idDigits = re.search(r'\b\d+\b', adapter.get("id", ""))
+        if idDigits :
+            adapter["id"] = int(idDigits.group())
+        else:
+            if "online" in adapter.get("id", ""):
+                scrapingLogger.warning(f"Can't process shop id, input data:{adapter['id']}")
+            raise DropItem()
+        
+        adapter["address"] = adapter.get("address", "").strip()
+        adapter["phone"] = adapter.get("phone", "").strip()
+        try:
+            schedule = adapter.get("schedule", [])
+            schedule = [ row.strip() for row in schedule]
+            adapter["schedule"] = ", ".join(schedule)
+        except Exception:
+            scrapingLogger.exception(f"Schedule process error at {adapter['id']}: ")
+            adapter["schedule"] = ""
+
+
+        return item
