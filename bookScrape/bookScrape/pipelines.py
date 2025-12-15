@@ -21,6 +21,9 @@ class BookscrapePipeline:
         elif not img:
             adapter["img_src"] = None
 
+        if adapter.get("img_src") == "https://librarius.md/img/400/600/xaHR0cHM6Ly9jZG4ubGlicmFyaXVzLm1kL2ltZy9lbXB0eS1jb3Zlci00MDAtNjAwLmpwZw_e__e_.jpg.pagespeed.ic.gbn-57_Gk8.jpg":
+            adapter["img_src"] = None
+
         adapter["stock"] = adapter.get("stock", "").strip()
 
         adapter['price'] = self.parse_price(adapter.get('price'))

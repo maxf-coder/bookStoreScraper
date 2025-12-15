@@ -16,7 +16,6 @@ class BookspiderSpider(scrapy.Spider):
 
     def parse(self, response):
         book_urls = response.css('div.anyproduct-card a::attr(href)').getall()
-        scrapingLogger.info(f"{len(book_urls)} book urls at {response.url}")
         for book_url in book_urls:
             if book_url:
                 yield response.follow(response.urljoin(book_url), callback=self.parse_book)
