@@ -179,8 +179,7 @@ class ShopscrapePipeline:
         if idDigits :
             adapter["id"] = int(idDigits.group())
         else:
-            if "online" in adapter.get("id", ""):
-                scrapingLogger.warning(f"Can't process shop id, input data:{adapter['id']}")
+            scrapingLogger.warning(f"Invalid shop id, processing id: {adapter.get('id')}")
             raise DropItem()
         
         adapter["address"] = adapter.get("address", "").strip()

@@ -12,19 +12,31 @@ class BookspiderSpider(scrapy.Spider):
         }
     }
 
+    @classmethod
+    def from_crawler(cls, crawler, *args, **kwargs):
+        spider = super().from_crawler(crawler, *args, **kwargs)
+        max_pages = crawler.settings.get("BOOKS_MAX_PAGES", 0)
+        spider.books_max_pages = int(max_pages) if max_pages is not None else 0
+        return spider
+
 
     def parse(self, response):
         book_urls = response.css('div.anyproduct-card a::attr(href)').getall()
-        for book_url in book_urls:
-            if book_url:
-                yield response.follow(response.urljoin(book_url), callback=self.parse_book)
 
-        next_page = response.css('li.page-item.active + li.page-item')
-        if next_page:
-            next_page_num = next_page.css('::text').get()
-            if int(next_page_num) < 11:
-                next_page_url = next_page.css('a::attr(href)').get()
-                yield response.follow(next_page_url, callback = self.parse)
+        for book_url in book_urls:
+            yield response.follow(book_url, callback=self.parse_book)
+
+        next_page_url = response.css('li.page-item.active + li.page-item a::attr(href)').get()
+        if not next_page_url:
+            return
+
+        if self.books_max_pages > 0:
+            next_page_num = int(next_page_url.rstrip("/").split("/")[-1])
+            if next_page_num > self.books_max_pages:
+                return
+
+        yield response.follow(next_page_url, callback=self.parse)
+
 
     def parse_book(self, response):
         book = BookItem()

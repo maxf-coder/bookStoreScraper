@@ -25,4 +25,5 @@ class ShopspiderSpider(scrapy.Spider):
             shop["phone"] = shopDiv.xpath('./div[2]//a[@title="phone"]//text()').get(default="")
             shop["schedule"] = shopDiv.xpath('./div[3]/small/text()').getall()
 
-            yield shop
+            if not "online" in shop["id"].lower():
+                yield shop

@@ -53,5 +53,7 @@ DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_NAME = os.getenv("DB_NAME")
 
+BOOKS_MAX_PAGES = 10
+
 LOG_LEVEL = 'INFO'
 #LOG_FILE = "scrapy_errors.log"
