@@ -2,6 +2,8 @@ import random
 import requests
 from scrapy.http import HtmlResponse
 from configs import scrapingLogger
+from twisted.internet import defer
+import treq
 
 
 class ScrapeOpsHeadersMiddleware:
@@ -57,33 +59,37 @@ class ScrapeOpsProxyFallbackMiddleware:
     @classmethod
     def from_crawler(cls, crawler):
         api_key = crawler.settings.get("SCRAPEOPS_API_KEY")
-
         if not api_key:
             raise RuntimeError("SCRAPEOPS_API_KEY missing")
-
         return cls(api_key)
 
     def process_response(self, request, response, spider):
-        if response.status not in (403,429):
+        if response.status not in (403, 429):
             return response
 
         scrapingLogger.warning(f"Blocked ({response.status}), retry via scrapeops: {request.url}")
 
-        r = requests.get(
-            url='https://proxy.scrapeops.io/v1/',
-            params={
-                'api_key': self.api_key,
-                'url': request.url, 
-            },
-            timeout = 20
-        )
+        proxy_url = f'https://proxy.scrapeops.io/v1/?api_key={self.api_key}&url={request.url}'
 
-        if r.status_code != 200:
+        d = treq.get(proxy_url)
+
+        def cb(resp):
+            return treq.content(resp)
+
+        def cb2(body):
+            return HtmlResponse(
+                url=request.url,
+                body=body,
+                encoding="utf-8",
+                request=request
+            )
+
+        def eb(failure):
+            spider.logger.warning(f"ScrapeOps proxy failed: {failure}")
             return response
 
-        return HtmlResponse(
-            url = request.url,
-            body = r.content,
-            encoding = "utf-8",
-            request = request
-        )
+        d.addCallback(cb)
+        d.addCallback(cb2)
+        d.addErrback(eb)
+
+        return d
