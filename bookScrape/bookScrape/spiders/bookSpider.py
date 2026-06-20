@@ -70,11 +70,10 @@ class BookspiderSpider(scrapy.Spider):
         availability = {}
 
         for row in availabilityRows:
-            idTd = row.xpath("./td[1]")
-            key = idTd.xpath("string(.)").get()
+            key = row.xpath("./td[1]/a/@data-id").get()
             value = row.xpath("./td[3]/text()").get()
             if key and value:
-                availability[key.strip()] = value
+                availability[key.strip()] = value.strip()
 
         book["availability"] = availability
 

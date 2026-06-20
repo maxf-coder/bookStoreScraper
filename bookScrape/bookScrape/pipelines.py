@@ -157,6 +157,10 @@ class SaveBookToMySQLPipeline:
 
         availabilities = adapter.get("availability", {})
         if availabilities:
+            self.cur.executemany("""
+                INSERT IGNORE INTO shops (id, address, phone, schedule)
+                VALUES (%s, %s, %s, %s)
+            """, [(shopId, "Unknown", "Unknown", "") for shopId in availabilities])
             values = [(adapter["id"], shopId, stock) for shopId, stock in availabilities.items()]
             self.cur.executemany("""
                 INSERT INTO books_shops (bookId, shopId, stock)
