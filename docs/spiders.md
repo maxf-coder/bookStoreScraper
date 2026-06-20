@@ -39,7 +39,7 @@ Extracts the following fields from a book detail page:
 | `old_price` | `div.product-book-price__discount del::text` |
 | `discount_procent` | `span.discount-badge::text` |
 | `properties` | Iterates `div.book-props-item`, extracting key from `div.book-prop-name` and value from `div.book-prop-value` |
-| `availability` | Iterates `table.table-striped tbody tr`, extracts shop ID from first cell and stock text from third cell |
+| `availability` | Iterates `table.table-striped tbody tr`, extracts shop ID from `data-id` attribute of the `<a>` tag in the first cell and stock text from third cell |
 
 Yields a `BookItem` for each book.
 

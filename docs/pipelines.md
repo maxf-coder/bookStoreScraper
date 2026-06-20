@@ -39,7 +39,8 @@ Persists cleaned `BookItem` data to MySQL.
 ### `process_item(item, spider)`
 
 1. **Upserts the book** into `books` via `INSERT ... ON DUPLICATE KEY UPDATE`. This means re-crawling a book updates its existing record.
-2. **Upserts availability entries** into `books_shops` via `executemany` with `ON DUPLICATE KEY UPDATE`. Each entry links a book to a shop with a stock status.
+2. **Inserts placeholder shops** via `INSERT IGNORE INTO shops` for any shop IDs referenced in availability that may not yet exist in the database. This prevents foreign key errors when the shop spider runs concurrently.
+3. **Upserts availability entries** into `books_shops` via `executemany` with `ON DUPLICATE KEY UPDATE`. Each entry links a book to a shop with a stock status.
 
 ### `close_spider(spider)`
 
